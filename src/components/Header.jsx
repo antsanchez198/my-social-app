@@ -1,4 +1,5 @@
 import { useNavigate } from "react-router-dom"
+import {auth} from "../firebase"
 
 const Header = () => {
 
@@ -13,7 +14,11 @@ const Header = () => {
                 <ul className="flex space-x-5 text-white">
                     <li className="cursor-pointer" onClick={() => navigate("/")}>Feed</li>
                     <li className="cursor-pointer" onClick={() => navigate("/post")}>Post</li>
-                    <li className="cursor-pointer" onClick={() => navigate("/")}>Account</li>
+                    {auth.currentUser ? 
+                    <li className="cursor-pointer" onClick={() => navigate("/sign-up")}>Log Out</li> :
+                    <li className="cursor-pointer" onClick={() => navigate("/sign-up")}>Sign In</li>
+                    }
+                    
                 </ul>
             </div>
         </div>

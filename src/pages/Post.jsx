@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { db, auth } from '../firebase';
 
 const Post = () => {
 
@@ -38,6 +39,9 @@ const Post = () => {
     });
   };
 
+  const onSubmit = () => {
+    
+  }
 
   console.log(formData)
 
@@ -55,7 +59,7 @@ const Post = () => {
       </ul>
       <div className="">
         <p className="text-lg mt-6 font-semibold">Title</p>
-        <input type="text" id="name" placeholder="Title" maxLength="32" minLength="10" required onChange={onFileChange}
+        <input type="text" id="name" placeholder="Title" maxLength="100" minLength="10" required onChange={onFileChange}
           className="w-full p-2 text-xl text-gray-700 bg-white border border-gray-300 rounded transition duration-150 ease-in-out
             focus:text-gray-700 focus:bg-white focus:border-slate-600 mb-6"/>
       </div>
@@ -92,6 +96,7 @@ const Post = () => {
           <p className="italic font-semibold">Max number of Images: 6</p>
         </>
       }
+      <button className='w-40 mx-0 my-auto bg-slate-500 px-2 py-4' onClick={onSubmit}>Submit</button>
     </div>
   )
 }
