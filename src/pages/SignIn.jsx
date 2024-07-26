@@ -1,4 +1,6 @@
 import React, { useState } from 'react'
+import { signInWithEmailAndPassword } from "firebase/auth";
+import { auth } from '../firebase';
 
 const SignIn = () => {
 
@@ -7,7 +9,7 @@ const SignIn = () => {
         password: "",
     })
 
-    const {email, password} = form;
+    const { email, password } = form;
     const [showPassword, setShowPassword] = useState(false);
 
     const onChange = (e) => {
@@ -19,7 +21,15 @@ const SignIn = () => {
     }
 
     const onSubmit = (e) => {
-        
+        signInWithEmailAndPassword(auth, email, password)
+            .then((userCredential) => {
+                const user = userCredential.user;
+                navigate("/");
+            })
+            .catch((error) => {
+                const errorCode = error.code;
+                const errorMessage = error.message;
+            });
     }
 
     return (
