@@ -1,6 +1,9 @@
 import React, { useState } from 'react'
 import { signInWithEmailAndPassword } from "firebase/auth";
 import { auth } from '../firebase';
+import { AiFillEyeInvisible, AiFillEye} from 'react-icons/ai';
+import { Link } from 'react-router-dom';
+import OAuth from '../components/OAuth';
 
 const SignIn = () => {
 
@@ -9,7 +12,7 @@ const SignIn = () => {
         password: "",
     })
 
-    const { email, password } = form;
+    const { email, password } = formData;
     const [showPassword, setShowPassword] = useState(false);
 
     const onChange = (e) => {
@@ -19,6 +22,8 @@ const SignIn = () => {
         }))
         console.log(formData)
     }
+
+    console.log(auth.currentUser, "user")
 
     const onSubmit = (e) => {
         signInWithEmailAndPassword(auth, email, password)

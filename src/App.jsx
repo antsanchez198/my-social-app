@@ -3,6 +3,7 @@ import Header from './components/Header'
 import HomeFeed from './pages/HomeFeed'
 import Login from './pages/Login'
 import SignUp from './pages/SignUp'
+import SignIn from './pages/SignIn'
 import Post from './pages/Post'
 import Profile from './pages/Profile'
 
@@ -15,6 +16,7 @@ function App() {
           <Route path="/" element={<HomeFeed />}></Route>
           <Route path="/login" element={<Login />}></Route>
           <Route path="/sign-up" element={<SignUp />}></Route>
+          <Route path="/sign-in" element={<SignIn />}></Route>
           <Route path="/post" element={<Post />}></Route>
           <Route path="/profile" element={<Profile />}></Route>
         </Routes>

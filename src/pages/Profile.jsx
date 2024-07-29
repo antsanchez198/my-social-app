@@ -1,13 +1,21 @@
 import { signOut } from "firebase/auth";
 import { auth } from "../firebase";
+import { useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
 
 const Profile = () => {
+
+    const navigate = useNavigate();
 
     const logout = () => {
         signOut(auth).then(() => {
             // Sign-out successful.
+            toast
+            navigate("/");
+
         }).catch((error) => {
             // An error happened.
+            console.log(error)
         });
     }
 

@@ -16,7 +16,7 @@ const Header = () => {
                     <li className="cursor-pointer" onClick={() => navigate("/post")}>Post</li>
                     {auth.currentUser ? 
                     <li className="cursor-pointer" onClick={() => navigate("/profile")}>Profile</li> :
-                    <li className="cursor-pointer" onClick={() => navigate("/sign-up")}>Sign In</li>
+                    <li className="cursor-pointer" onClick={() => navigate("/sign-in")}>Sign In</li>
                     }
                     
                 </ul>

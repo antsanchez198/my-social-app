@@ -13,6 +13,7 @@ import { toast } from "react-toastify";
 
 export default function SignUp() {
   const [showPassword, setShowPassword] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -49,7 +50,7 @@ export default function SignUp() {
       navigate("/");
     } catch (error) {
       toast.error("Something went wrong with the registration");
-      console.log(error)
+      setErrorMessage(error.message);
     }
   }
   return (
@@ -121,6 +122,7 @@ export default function SignUp() {
                 </Link>
               </p>
             </div>
+            {errorMessage ? <div className="text-red-700 mb-6">{errorMessage}</div> : <></>}
             <button
               className="w-full bg-blue-600 text-white px-7 py-3 text-sm font-medium uppercase rounded shadow-md hover:bg-blue-700 transition duration-150 ease-in-out hover:shadow-lg active:bg-blue-800"
               type="submit"
