@@ -1,8 +1,9 @@
 import React, { useState } from 'react'
 import { signInWithEmailAndPassword } from "firebase/auth";
 import { auth } from '../firebase';
-import { AiFillEyeInvisible, AiFillEye} from 'react-icons/ai';
+import { AiFillEyeInvisible, AiFillEye } from 'react-icons/ai';
 import { Link } from 'react-router-dom';
+import { useNavigate } from "react-router-dom";
 import OAuth from '../components/OAuth';
 
 const SignIn = () => {
@@ -12,7 +13,9 @@ const SignIn = () => {
         password: "",
     })
 
+    const navigate = useNavigate()
     const { email, password } = formData;
+    const [errorMessage, setErrorMessage] = useState("");
     const [showPassword, setShowPassword] = useState(false);
 
     const onChange = (e) => {
@@ -23,17 +26,17 @@ const SignIn = () => {
         console.log(formData)
     }
 
-    console.log(auth.currentUser, "user")
-
-    const onSubmit = (e) => {
+    async function onSubmit(e) {
+        e.preventDefault();
         signInWithEmailAndPassword(auth, email, password)
             .then((userCredential) => {
                 const user = userCredential.user;
+                console.log(user)
                 navigate("/");
             })
             .catch((error) => {
-                const errorCode = error.code;
-                const errorMessage = error.message;
+                console.log(error)
+                setErrorMessage(error.message);
             });
     }
 
@@ -79,6 +82,9 @@ const SignIn = () => {
                                 <Link to="/forgot-password" className="text-blue-600 hover:text-blue-800 transition duration-200 ease-in-out">Forgot Password?</Link>
                             </p>
                         </div>
+                        
+                        {errorMessage ? <div className="text-red-700 mb-6">{errorMessage}</div> : <></>}
+                        
                         <button className="w-full bg-blue-600 text-white px-7 py-3 text-sm font-medium uppercase rounded shadow-md
           hover:bg-blue-700 transition duration-200 ease-in-out hover:shadow-lg active:bg-blue-800">
                             Sign in
