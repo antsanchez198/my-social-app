@@ -6,6 +6,8 @@ import { IoMdAddCircleOutline } from 'react-icons/io';
 import { HiCamera } from 'react-icons/hi';
 import { AiOutlineClose } from 'react-icons/ai';
 import { signOut } from "firebase/auth";
+import WordPost from "./WordPost";
+import ImgPost from "./ImgPost";
 
 
 const Header = () => {
@@ -14,6 +16,9 @@ const Header = () => {
     const [isOpen, setIsOpen] = useState(false);
     const [selectedFile, setSelectedFile] = useState(null);
     const [imageFileUrl, setImageFileUrl] = useState(null);
+    const [imageFileUploading, setImageFileUploading] = useState(false);
+    const [postUploading, setPostUploading] = useState(false);
+    const [postType, setPostType] = useState("double");
 
     async function logout(e) {
         e.preventDefault();
@@ -33,10 +38,10 @@ const Header = () => {
     function addImageToPost(e) {
         const file = e.target.files[0];
         if (file) {
-          setSelectedFile(file);
-          setImageFileUrl(URL.createObjectURL(file));
+            setSelectedFile(file);
+            setImageFileUrl(URL.createObjectURL(file));
         }
-      }
+    }
 
     return (
         <div className='shadow-sm border-b sticky top-0 bg-white z-30 p-3'>
@@ -73,45 +78,35 @@ const Header = () => {
             {isOpen && (
                 <Modal
                     isOpen={isOpen}
-                    className='max-w-lg w-[90%] p-6 absolute top-56 left-[50%] translate-x-[-50%] bg-white border-2 rounded-md shadow-md'
+                    className='max-w-lg w-[90%] p-6 absolute top-56 left-[50%] translate-x-[-50%] bg-white border-2 rounded-md shadow-md flex flex-col gap-10'
                     onRequestClose={() => setIsOpen(false)}
                     ariaHideApp={false}
                 >
-                    <div className='flex flex-col justify-center items-center h-[100%]'>
-                        {selectedFile ? (
-                            <img
-                                onClick={() => setSelectedFile(null)}
-                                src={imageFileUrl}
-                                alt='selected file'
-                                className={`w-full max-h-[250px] object-over cursor-pointer ${imageFileUploading ? 'animate-pulse' : ''
-                                    }`}
-                            />
-                        ) : (
-                            <HiCamera
-                                onClick={() => filePickerRef.current.click()}
-                                className='text-5xl text-gray-400 cursor-pointer'
-                            />
-                        )}
-                        <input
-                            hidden
-                            ref={filePickerRef}
-                            type='file'
-                            accept='image/*'
-                            onChange={addImageToPost}
-                        />
-                    </div>
                     <input
                         type='text'
                         maxLength='150'
-                        placeholder='Please enter you caption...'
+                        placeholder='Please enter you your title...'
                         className='m-4 border-none text-center w-full focus:ring-0 outline-none'
-                        // onChange={(e) => setCaption(e.target.value)}
+                    // onChange={(e) => setCaption(e.target.value)}
                     />
+                    <ul className='flex justify-center items-center space-x-3'>
+                        <li onClick={() => {
+                            setPostType("double");
+                            // setFormData(prevState => ({ ...prevState, choices: {} }));
+                        }} className='cursor-pointer hover:border-b-slate-300'>Images</li>
+                        <li onClick={() => {
+                            setPostType("worded");
+                            // setFormData(prevState => ({ ...prevState, choices: {} }));
+                        }}>Worded</li>
+                    </ul>
+                    {postType == "worded" ? 
+                        <WordPost/> : <ImgPost/>
+                    }
                     <button
                         // onClick={handleSubmit}
                         disabled={
                             !selectedFile ||
-                            caption.trim() === '' ||
+                            // caption.trim() === '' ||
                             postUploading ||
                             imageFileUploading
                         }
