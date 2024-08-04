@@ -8,6 +8,7 @@ import { AiOutlineClose } from 'react-icons/ai';
 import { signOut } from "firebase/auth";
 import WordPost from "./WordPost";
 import ImgPost from "./ImgPost";
+import Images from "./Images"
 
 
 const Header = () => {
@@ -18,7 +19,7 @@ const Header = () => {
     const [imageFileUrl, setImageFileUrl] = useState(null);
     const [imageFileUploading, setImageFileUploading] = useState(false);
     const [postUploading, setPostUploading] = useState(false);
-    const [postType, setPostType] = useState("double");
+    const [postType, setPostType] = useState("worded");
 
     async function logout(e) {
         e.preventDefault();
@@ -82,16 +83,9 @@ const Header = () => {
                     onRequestClose={() => setIsOpen(false)}
                     ariaHideApp={false}
                 >
-                    <input
-                        type='text'
-                        maxLength='150'
-                        placeholder='Please enter you your title...'
-                        className='m-4 border-none text-center w-full focus:ring-0 outline-none'
-                    // onChange={(e) => setCaption(e.target.value)}
-                    />
                     <ul className='flex justify-center items-center space-x-3'>
                         <li onClick={() => {
-                            setPostType("double");
+                            setPostType("images");
                             // setFormData(prevState => ({ ...prevState, choices: {} }));
                         }} className='cursor-pointer hover:border-b-slate-300'>Images</li>
                         <li onClick={() => {
@@ -99,8 +93,15 @@ const Header = () => {
                             // setFormData(prevState => ({ ...prevState, choices: {} }));
                         }}>Worded</li>
                     </ul>
+                    <input
+                        type='text'
+                        maxLength='150'
+                        placeholder='Please enter you your title...'
+                        className='m-4 border-none text-center w-full focus:ring-0 outline-none'
+                    // onChange={(e) => setCaption(e.target.value)}
+                    />
                     {postType == "worded" ? 
-                        <WordPost/> : <ImgPost/>
+                        <WordPost/> : <Images/>
                     }
                     <button
                         // onClick={handleSubmit}
