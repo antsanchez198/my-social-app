@@ -7,7 +7,7 @@ const Images = () => {
     const maxNumber = 6;
     const onChange = (imageList, addUpdateIndex) => {
         // data for submit
-        console.log(imageList, addUpdateIndex);
+        console.log(imageList);
         setImages(imageList);
     };
     return (
@@ -32,30 +32,34 @@ const Images = () => {
                     // write your building UI
                     <div className="flex justify-center items-center flex-col">
                         <div>Click or Drop here</div>
-                        <div className="border-2 border-slate-400 w-40 h-40 rounded-lg flex justify-center items-center cursor-pointer shadow-md hover:shadow-lg"
-                            onClick={() => filePickerRef.current.click()}>
-                            <HiCamera
-                                className={`text-5xl ${isDragging ? 'text-red-600' : 'text-gray-400'}`}
-                            />    
-                            </div>
-                        {/* <button
-                            style={isDragging ? { color: "red" } : null}
+                        <div
+                            className="border-2 border-slate-400 w-40 h-40 rounded-lg flex justify-center items-center cursor-pointer shadow-md hover:shadow-lg"
                             onClick={onImageUpload}
                             {...dragProps}
                         >
-                            Click or Drop here
-                        </button> */}
-                        &nbsp;
-                        <button onClick={onImageRemoveAll}>Remove all images</button>
+                            <HiCamera
+                                className={`text-5xl ${isDragging ? 'text-red-600' : 'text-gray-400'}`}
+                            />
+                        </div>
+                        <button onClick={onImageRemoveAll} class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded">Remove all images</button>
+                        <div className="flex flex-row gap-3 my-7 w-100 flex-wrap">
                         {imageList.map((image, index) => (
-                            <div key={index} className="image-item">
-                                <img src={image.data_url} alt="" width="100" />
-                                <div className="image-item__btn-wrapper">
-                                    <button onClick={() => onImageUpdate(index)}>Update</button>
-                                    <button onClick={() => onImageRemove(index)}>Remove</button>
+                            <div key={index} className="flex flex-col w-60 h-60">
+                                <img src={image.data_url} alt="" className="w-full" />
+                                <div className="flex justify-center items-center">
+                                    <button 
+                                    onClick={() => onImageUpdate(index)}
+                                    class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded-l"
+                                    >Update</button>
+                                    <button 
+                                    onClick={() => onImageRemove(index)}
+                                    class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded-l"
+                                    >Remove</button>
                                 </div>
                             </div>
                         ))}
+                        </div>
+                        
                     </div>
                 )}
             </ImageUploading>

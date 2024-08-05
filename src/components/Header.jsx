@@ -45,8 +45,8 @@ const Header = () => {
     }
 
     return (
-        <div className='shadow-sm border-b sticky top-0 bg-white z-30 p-3'>
-            <div className="max-w-[90%] mx-auto flex justify-between items-center gap-10ß py-3">
+        <div className='shadow-sm border-b sticky top-0 bg-whites p-3 z-10'>
+            <div className="max-w-[90%] mx-auto flex justify-between items-center gap-10 py-3">
                 <div className="">
                     <img></img>
                 </div>
@@ -79,7 +79,7 @@ const Header = () => {
             {isOpen && (
                 <Modal
                     isOpen={isOpen}
-                    className='max-w-lg w-[90%] p-6 absolute top-56 left-[50%] translate-x-[-50%] bg-white border-2 rounded-md shadow-md flex flex-col gap-10'
+                    className='max-w-2xl w-[90%] z-20 p-6 absolute top-40 left-[50%] translate-x-[-50%] bg-white border-2 rounded-md shadow-md flex flex-col gap-10 overflow-y-visible'
                     onRequestClose={() => setIsOpen(false)}
                     ariaHideApp={false}
                 >
