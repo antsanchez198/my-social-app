@@ -21,6 +21,16 @@ const Header = () => {
     const [postUploading, setPostUploading] = useState(false);
     const [postType, setPostType] = useState("worded");
 
+    const [formData, setFormData] = useState({
+        type: postType,
+        decisionTitle: "",
+        choices: {},
+    })
+
+    useEffect(() => {
+        console.log(formData)
+    }, [formData])
+
     async function logout(e) {
         e.preventDefault();
         signOut(auth).then(() => {
@@ -80,17 +90,24 @@ const Header = () => {
                 <Modal
                     isOpen={isOpen}
                     className='max-w-2xl w-[90%] z-20 p-6 absolute top-40 left-[50%] translate-x-[-50%] bg-white border-2 rounded-md shadow-md flex flex-col gap-10 overflow-y-visible'
-                    onRequestClose={() => setIsOpen(false)}
+                    onRequestClose={() => {
+                        setIsOpen(false);
+                        setFormData((prevState) => ({
+                            ...prevState,
+                            decisionTitle: "",
+                            choices: {},
+                        }))
+                    }}
                     ariaHideApp={false}
                 >
                     <ul className='flex justify-center items-center space-x-3'>
                         <li onClick={() => {
                             setPostType("images");
-                            // setFormData(prevState => ({ ...prevState, choices: {} }));
+                            setFormData(prevState => ({ ...prevState, choices: {} }));
                         }} className='cursor-pointer hover:border-b-slate-300'>Images</li>
                         <li onClick={() => {
                             setPostType("worded");
-                            // setFormData(prevState => ({ ...prevState, choices: {} }));
+                            setFormData(prevState => ({ ...prevState, choices: {} }));
                         }}>Worded</li>
                     </ul>
                     <input
@@ -98,18 +115,22 @@ const Header = () => {
                         maxLength='150'
                         placeholder='Please enter you your title...'
                         className='m-4 border-none text-center w-full focus:ring-0 outline-none'
-                    // onChange={(e) => setCaption(e.target.value)}
+                        onChange={e =>
+                            setFormData((prevState) => ({
+                                ...prevState,
+                                decisionTitle: e.target.value,
+                            }))
+                        }
                     />
-                    {postType == "worded" ? 
-                        <WordPost/> : <Images/>
+                    {postType == "worded" ?
+                        <WordPost /> :
+                        <Images setFormData={setFormData} />
                     }
                     <button
                         // onClick={handleSubmit}
                         disabled={
-                            !selectedFile ||
-                            // caption.trim() === '' ||
-                            postUploading ||
-                            imageFileUploading
+                            !formData.decisionTitle ||
+                            !formData.choices
                         }
                         className='w-full bg-red-600 text-white p-2 shadow-md rounded-lg hover:brightness-105 disabled:bg-gray-200 disabled:cursor-not-allowed disabled:hover:brightness-100'
                     >
