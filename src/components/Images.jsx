@@ -3,7 +3,7 @@ import ImageUploading from "react-images-uploading";
 import { HiCamera } from 'react-icons/hi';
 import { useEffect } from "react";
 
-const Images = ({ setFormData }) => {
+const Images = ({ setFormData, setUploadImages}) => {
     const [images, setImages] = React.useState([]);
     const maxNumber = 6;
 
@@ -20,7 +20,8 @@ const Images = ({ setFormData }) => {
 
     const onChange = (imageList) => {
         setImages(imageList);
-        console.log(images);
+        setUploadImages(imageList)
+        // console.log(images);
     };
 
     return (

@@ -8,8 +8,10 @@ import { AiOutlineClose } from 'react-icons/ai';
 import { signOut } from "firebase/auth";
 import WordPost from "./WordPost";
 import ImgPost from "./ImgPost";
-import Images from "./Images"
-
+import Images from "./Images";
+import { getDownloadURL, getStorage, ref, uploadBytesResumable, } from 'firebase/storage';
+import { app, db } from "../firebase";
+import { ToastContainer } from "react-toastify";
 
 const Header = () => {
 
@@ -27,9 +29,52 @@ const Header = () => {
         choices: {},
     })
 
+    const [uploadImages, setUploadImages] = useState(null);
+
     useEffect(() => {
         console.log(formData)
     }, [formData])
+
+    useEffect(() => {
+        console.log(uploadImages)
+    }, [uploadImages])
+
+    async function uploadImagesToStorage() {
+        const storage = getStorage(app);
+        uploadImages.map((currentImage) => {
+            const fileName = new Date().getTime() + '-' + currentImage.name;
+            const storageRef = ref(storage, fileName);
+            const uploadTask = uploadBytesResumable(storageRef, currentImage);
+            uploadTask.on(
+                'state_changed',
+                (snapshot) => {
+                    const progress =
+                        (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+                    console.log('Upload is ' + progress + '% done');
+                },
+                (error) => {
+                    console.error(error);
+                    setUploadImages(false);
+                },
+                () => {
+                    setIsOpen(false);
+                    <ToastContainer
+                        position="bottom-center"
+                        autoClose={2500}
+                        hideProgressBar={false}
+                        newestOnTop={false}
+                        closeOnClick
+                        rtl={false}
+                        pauseOnFocusLoss
+                        draggable
+                        pauseOnHover={false}
+                        theme="light"
+                        transition:Bounce
+                    />
+                });
+        }
+        );
+    }
 
     async function logout(e) {
         e.preventDefault();
@@ -124,14 +169,14 @@ const Header = () => {
                     />
                     {postType == "worded" ?
                         <WordPost /> :
-                        <Images setFormData={setFormData} />
+                        <Images setFormData={setFormData} setUploadImages={setUploadImages} />
                     }
                     <button
-                        // onClick={handleSubmit}
-                        disabled={
-                            !formData.decisionTitle ||
-                            !formData.choices
-                        }
+                        onClick={uploadImagesToStorage}
+                        // disabled={
+                        //     formData.decisionTitle == "" &&
+                        //     formData.choices.length == 0
+                        // }
                         className='w-full bg-red-600 text-white p-2 shadow-md rounded-lg hover:brightness-105 disabled:bg-gray-200 disabled:cursor-not-allowed disabled:hover:brightness-100'
                     >
                         Upload Post
