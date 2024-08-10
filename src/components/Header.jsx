@@ -42,15 +42,17 @@ const Header = () => {
     async function uploadImagesToStorage() {
         const storage = getStorage(app);
         uploadImages.map((currentImage) => {
-            const fileName = new Date().getTime() + '-' + currentImage.name;
+            // const fileName = new Date().getTime() + '-' + currentImage.file.name;
+            // const storageRef = ref(storage, fileName);
+            const fileName = new Date().getTime() + '-' + currentImage.file.name;
             const storageRef = ref(storage, fileName);
-            const uploadTask = uploadBytesResumable(storageRef, currentImage);
+            const uploadTask = uploadBytesResumable(storageRef, currentImage.file);
             uploadTask.on(
                 'state_changed',
                 (snapshot) => {
                     const progress =
                         (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-                    console.log('Upload is ' + progress + '% done');
+                        console.log('Upload is ' + progress + '% done');
                 },
                 (error) => {
                     console.error(error);

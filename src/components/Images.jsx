@@ -32,7 +32,7 @@ const Images = ({ setFormData, setUploadImages}) => {
                 onChange={onChange}
                 maxNumber={maxNumber}
                 dataURLKey="data_url"
-                acceptType={["jpg"]}
+                acceptType={['jpg', 'jpeg', 'png']}
             >
                 {({
                     imageList,

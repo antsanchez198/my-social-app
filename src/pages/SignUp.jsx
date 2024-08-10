@@ -15,11 +15,11 @@ export default function SignUp() {
   const [showPassword, setShowPassword] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
   const [formData, setFormData] = useState({
-    name: "",
+    username: "",
     email: "",
     password: "",
   });
-  const { name, email, password } = formData;
+  const { username, email, password } = formData;
   const navigate = useNavigate();
   function onChange(e) {
     setFormData((prevState) => ({
@@ -38,7 +38,7 @@ export default function SignUp() {
       );
 
       updateProfile(auth.currentUser, {
-        displayName: name,
+        displayName: username,
       });
       const user = userCredential.user;
       const formDataCopy = { ...formData };
@@ -68,10 +68,10 @@ export default function SignUp() {
           <form onSubmit={onSubmit}>
             <input
               type="text"
-              id="name"
-              value={name}
+              id="username"
+              value={username}
               onChange={onChange}
-              placeholder="Full name"
+              placeholder="Username"
               className="mb-6 w-full px-4 py-2 text-xl text-gray-700 bg-white border-gray-300 rounded transition ease-in-out"
             />
             <input
