@@ -3,19 +3,19 @@ import ImageUploading from "react-images-uploading";
 import { HiCamera } from 'react-icons/hi';
 import { useEffect } from "react";
 
-const Images = ({ setFormData, setUploadImages}) => {
+const Images = ({ setFormData, setUploadImages }) => {
     const [images, setImages] = React.useState([]);
     const maxNumber = 6;
 
     useEffect(() => {
-        const imageObject = images.map((image) => ({
-            image,
-            likes: 0, // Initialize likes for each image to 0
-        }));
-        setFormData((prevState) => ({
-            ...prevState,
-            choices: imageObject,
-        }));
+        // const imageObject = images.map((image) => ({
+        //     image,
+        //     likes: 0, // Initialize likes for each image to 0
+        // }));
+        // setFormData((prevState) => ({
+        //     ...prevState,
+        //     choices: imageObject,
+        // }));
     }, [images, setFormData]); // Depend on images and setFormData
 
     const onChange = (imageList) => {

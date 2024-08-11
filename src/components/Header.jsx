@@ -1,5 +1,4 @@
 import { useNavigate } from "react-router-dom"
-import { auth } from "../firebase"
 import Modal from 'react-modal';
 import { useEffect, useRef, useState } from 'react';
 import { IoMdAddCircleOutline } from 'react-icons/io';
@@ -10,17 +9,23 @@ import WordPost from "./WordPost";
 import ImgPost from "./ImgPost";
 import Images from "./Images";
 import { getDownloadURL, getStorage, ref, uploadBytesResumable, } from 'firebase/storage';
-import { app, db } from "../firebase";
+import { app, db, auth } from "../firebase";
 import { ToastContainer } from "react-toastify";
+import {
+    addDoc,
+    collection,
+    getFirestore,
+    serverTimestamp,
+  } from 'firebase/firestore';
 
 const Header = () => {
 
     const navigate = useNavigate();
     const [isOpen, setIsOpen] = useState(false);
-    const [selectedFile, setSelectedFile] = useState(null);
-    const [imageFileUrl, setImageFileUrl] = useState(null);
-    const [imageFileUploading, setImageFileUploading] = useState(false);
-    const [postUploading, setPostUploading] = useState(false);
+    // const [selectedFile, setSelectedFile] = useState(null);
+    const [imagesFileUrl, setImagesFileUrl] = useState([]);
+    // const [imageFileUploading, setImageFileUploading] = useState(false);
+    // const [postUploading, setPostUploading] = useState(false);
     const [postType, setPostType] = useState("worded");
 
     const [formData, setFormData] = useState({
@@ -33,11 +38,27 @@ const Header = () => {
 
     useEffect(() => {
         console.log(formData)
+        // console.log(auth.currentUser.displayName)
     }, [formData])
 
     useEffect(() => {
         console.log(uploadImages)
     }, [uploadImages])
+
+    useEffect(() => {
+        const imageObject = imagesFileUrl.map((image) => ({
+            image,
+            likes: 0, // Initialize likes for each image to 0
+        }));
+        setFormData((prevState) => ({
+            ...prevState,
+            choices: imageObject,
+        }));
+    }, [imagesFileUrl])
+
+    const addImageUrl = (newUrl) => {
+        setImagesFileUrl((prevImages) => [...prevImages, newUrl]);
+    };
 
     async function uploadImagesToStorage() {
         const storage = getStorage(app);
@@ -52,7 +73,7 @@ const Header = () => {
                 (snapshot) => {
                     const progress =
                         (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-                        console.log('Upload is ' + progress + '% done');
+                    console.log('Upload is ' + progress + '% done');
                 },
                 (error) => {
                     console.error(error);
@@ -60,22 +81,24 @@ const Header = () => {
                 },
                 () => {
                     setIsOpen(false);
-                    <ToastContainer
-                        position="bottom-center"
-                        autoClose={2500}
-                        hideProgressBar={false}
-                        newestOnTop={false}
-                        closeOnClick
-                        rtl={false}
-                        pauseOnFocusLoss
-                        draggable
-                        pauseOnHover={false}
-                        theme="light"
-                        transition:Bounce
-                    />
+                    getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
+                        addImageUrl(downloadURL);
+                    });
                 });
         }
         );
+        uploadPostToDatabase();
+    }
+
+    async function uploadPostToDatabase() {
+        const docRef = await addDoc(collection(db, 'posts'), {
+            username: auth.currentUser.displayName,
+            type: formData.type,
+            decisionTitle: formData.decisionTitle,
+            choices: formData.choices,
+            timestamp: serverTimestamp(),
+          });
+        setIsOpen(false)
     }
 
     async function logout(e) {
