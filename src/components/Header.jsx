@@ -16,20 +16,16 @@ import {
     collection,
     getFirestore,
     serverTimestamp,
-  } from 'firebase/firestore';
+} from 'firebase/firestore';
 
 const Header = () => {
 
     const navigate = useNavigate();
     const [isOpen, setIsOpen] = useState(false);
-    // const [selectedFile, setSelectedFile] = useState(null);
     const [imagesFileUrl, setImagesFileUrl] = useState([]);
-    // const [imageFileUploading, setImageFileUploading] = useState(false);
-    // const [postUploading, setPostUploading] = useState(false);
-    const [postType, setPostType] = useState("worded");
 
     const [formData, setFormData] = useState({
-        type: postType,
+        type: "images",
         decisionTitle: "",
         choices: {},
     })
@@ -37,12 +33,12 @@ const Header = () => {
     const [uploadImages, setUploadImages] = useState(null);
 
     useEffect(() => {
-        console.log(formData)
+        console.log(formData, "formData")
         // console.log(auth.currentUser.displayName)
     }, [formData])
 
     useEffect(() => {
-        console.log(uploadImages)
+        // console.log(uploadImages)
     }, [uploadImages])
 
     useEffect(() => {
@@ -56,49 +52,64 @@ const Header = () => {
         }));
     }, [imagesFileUrl])
 
-    const addImageUrl = (newUrl) => {
+    async function addImageUrl(newUrl) {
         setImagesFileUrl((prevImages) => [...prevImages, newUrl]);
     };
 
     async function uploadImagesToStorage() {
         const storage = getStorage(app);
-        uploadImages.map((currentImage) => {
-            // const fileName = new Date().getTime() + '-' + currentImage.file.name;
-            // const storageRef = ref(storage, fileName);
-            const fileName = new Date().getTime() + '-' + currentImage.file.name;
-            const storageRef = ref(storage, fileName);
-            const uploadTask = uploadBytesResumable(storageRef, currentImage.file);
-            uploadTask.on(
-                'state_changed',
-                (snapshot) => {
-                    const progress =
-                        (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-                    console.log('Upload is ' + progress + '% done');
-                },
-                (error) => {
-                    console.error(error);
-                    setUploadImages(false);
-                },
-                () => {
-                    setIsOpen(false);
-                    getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
-                        addImageUrl(downloadURL);
-                    });
-                });
-        }
-        );
+        const uploadPromises = uploadImages.map((currentImage) => {
+            return new Promise((resolve, reject) => {
+                const fileName = new Date().getTime() + '-' + currentImage.file.name;
+                const storageRef = ref(storage, fileName);
+                const uploadTask = uploadBytesResumable(storageRef, currentImage.file);
+    
+                uploadTask.on(
+                    'state_changed',
+                    (snapshot) => {
+                        const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+                        console.log('Upload is ' + progress + '% done');
+                    },
+                    (error) => {
+                        console.error(error);
+                        setUploadImages(false);
+                        reject(error); // Reject the promise on error
+                    },
+                    () => {
+                        getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
+                            addImageUrl(downloadURL);
+                            resolve(); // Resolve the promise when done
+                        });
+                    }
+                );
+            });
+        });
+    
+        // Wait for all uploads to finish
+        await Promise.all(uploadPromises);
+    
+        // Now it's safe to call uploadPostToDatabase
         uploadPostToDatabase();
-    }
+    }    
 
     async function uploadPostToDatabase() {
+        console.log(formData.choices)
         const docRef = await addDoc(collection(db, 'posts'), {
             username: auth.currentUser.displayName,
-            type: formData.type,
-            decisionTitle: formData.decisionTitle,
-            choices: formData.choices,
+            ...formData,
             timestamp: serverTimestamp(),
-          });
-        setIsOpen(false)
+        });
+        setIsOpen(false);
+        setFormData(
+            prevState => (
+                {
+                    ...prevState,
+                    type: "images",
+                    decisionTitle: "",
+                    choices: {},
+                }
+            ))
+        setImagesFileUrl([])
     }
 
     async function logout(e) {
@@ -112,16 +123,6 @@ const Header = () => {
             // An error happened.
             console.log(error)
         });
-    }
-
-    const filePickerRef = useRef(null);
-
-    function addImageToPost(e) {
-        const file = e.target.files[0];
-        if (file) {
-            setSelectedFile(file);
-            setImageFileUrl(URL.createObjectURL(file));
-        }
     }
 
     return (
@@ -172,12 +173,24 @@ const Header = () => {
                 >
                     <ul className='flex justify-center items-center space-x-3'>
                         <li onClick={() => {
-                            setPostType("images");
-                            setFormData(prevState => ({ ...prevState, choices: {} }));
+                            setFormData(prevState => (
+                                {
+                                    ...prevState,
+                                    type: "images",
+                                    choices: {},
+                                }
+                            ));
+                            setImagesFileUrl([]);
                         }} className='cursor-pointer hover:border-b-slate-300'>Images</li>
                         <li onClick={() => {
-                            setPostType("worded");
-                            setFormData(prevState => ({ ...prevState, choices: {} }));
+                            setFormData(prevState => (
+                                {
+                                    ...prevState,
+                                    type: "worded",
+                                    choices: {},
+                                }
+                            ));
+                            setImagesFileUrl([]);
                         }}>Worded</li>
                     </ul>
                     <input
@@ -192,7 +205,7 @@ const Header = () => {
                             }))
                         }
                     />
-                    {postType == "worded" ?
+                    {formData.type == "worded" ?
                         <WordPost /> :
                         <Images setFormData={setFormData} setUploadImages={setUploadImages} />
                     }
