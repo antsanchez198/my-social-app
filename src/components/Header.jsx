@@ -27,89 +27,81 @@ const Header = () => {
     const [formData, setFormData] = useState({
         type: "images",
         decisionTitle: "",
-        choices: {},
-    })
+        choices: [],
+    });
 
     const [uploadImages, setUploadImages] = useState(null);
 
     useEffect(() => {
         console.log(formData, "formData")
-        // console.log(auth.currentUser.displayName)
+        console.log(formData.choices.length)
     }, [formData])
 
-    useEffect(() => {
-        // console.log(uploadImages)
-    }, [uploadImages])
+    // useEffect(() => {
+    //     // Update formData with the image URLs
+    //     const imageObject = imagesFileUrl.map((image) => ({
+    //         image,
+    //         likes: 0,
+    //     }));
+    //     setFormData((prevState) => ({
+    //         ...prevState,
+    //         choices: imageObject,
+    //     }));
+    // }, [imagesFileUrl])
 
-    useEffect(() => {
-        const imageObject = imagesFileUrl.map((image) => ({
-            image,
-            likes: 0, // Initialize likes for each image to 0
-        }));
-        setFormData((prevState) => ({
-            ...prevState,
-            choices: imageObject,
-        }));
-    }, [imagesFileUrl])
-
-    async function addImageUrl(newUrl) {
-        setImagesFileUrl((prevImages) => [...prevImages, newUrl]);
-    };
+    // async function addImageUrl(newUrl) {
+    //     setImagesFileUrl((prevImages) => [...prevImages, newUrl]);
+    // };
 
     async function uploadImagesToStorage() {
         const storage = getStorage(app);
-        const uploadPromises = uploadImages.map((currentImage) => {
-            return new Promise((resolve, reject) => {
-                const fileName = new Date().getTime() + '-' + currentImage.file.name;
-                const storageRef = ref(storage, fileName);
-                const uploadTask = uploadBytesResumable(storageRef, currentImage.file);
-    
-                uploadTask.on(
-                    'state_changed',
-                    (snapshot) => {
-                        const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-                        console.log('Upload is ' + progress + '% done');
-                    },
-                    (error) => {
-                        console.error(error);
-                        setUploadImages(false);
-                        reject(error); // Reject the promise on error
-                    },
-                    () => {
-                        getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
-                            addImageUrl(downloadURL);
-                            resolve(); // Resolve the promise when done
-                        });
-                    }
-                );
-            });
+
+        const uploadPromises = uploadImages.map(async (currentImage) => {
+            const fileName = new Date().getTime() + '-' + currentImage.file.name;
+            const storageRef = ref(storage, fileName);
+
+            const uploadTask = uploadBytesResumable(storageRef, currentImage.file);
+
+            await uploadTask; // Wait for the upload to complete
+
+            const downloadURL = await getDownloadURL(uploadTask.snapshot.ref);
+            return downloadURL; // Return the download URL
         });
-    
-        // Wait for all uploads to finish
-        await Promise.all(uploadPromises);
-    
-        // Now it's safe to call uploadPostToDatabase
-        uploadPostToDatabase();
-    }    
+
+        // Wait for all uploads to finish and collect download URLs
+        const downloadURLs = await Promise.all(uploadPromises);
+
+        // Update formData with download URLs
+        setFormData((prevState) => ({
+            ...prevState,
+            choices: downloadURLs.map((url) => ({
+                image: url,
+                likes: 0,
+            })),
+        }));
+    }
 
     async function uploadPostToDatabase() {
-        console.log(formData.choices)
         const docRef = await addDoc(collection(db, 'posts'), {
             username: auth.currentUser.displayName,
             ...formData,
             timestamp: serverTimestamp(),
         });
+
         setIsOpen(false);
         setFormData(
-            prevState => (
-                {
-                    ...prevState,
-                    type: "images",
-                    decisionTitle: "",
-                    choices: {},
-                }
-            ))
-        setImagesFileUrl([])
+            (prevState) => ({
+                ...prevState,
+                type: "images",
+                decisionTitle: "",
+                choices: [],
+            })
+        );
+    }
+
+    function handleSubmit() {
+        uploadImagesToStorage();
+        uploadPostToDatabase();
     }
 
     async function logout(e) {
@@ -210,7 +202,7 @@ const Header = () => {
                         <Images setFormData={setFormData} setUploadImages={setUploadImages} />
                     }
                     <button
-                        onClick={uploadImagesToStorage}
+                        onClick={() => handleSubmit()}
                         // disabled={
                         //     formData.decisionTitle == "" &&
                         //     formData.choices.length == 0
