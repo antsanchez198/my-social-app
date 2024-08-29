@@ -7,7 +7,6 @@ import { AiOutlineClose } from 'react-icons/ai';
 import { signOut } from "firebase/auth";
 import WordPost from "./WordPost";
 import ImgPost from "./ImgPost";
-import Images from "./Images";
 import { getDownloadURL, getStorage, ref, uploadBytesResumable, } from 'firebase/storage';
 import { app, db, auth } from "../firebase";
 import { ToastContainer } from "react-toastify";
@@ -199,7 +198,7 @@ const Header = () => {
                     />
                     {formData.type == "worded" ?
                         <WordPost /> :
-                        <Images setFormData={setFormData} setUploadImages={setUploadImages} />
+                        <ImgPost setFormData={setFormData} setUploadImages={setUploadImages} />
                     }
                     <button
                         onClick={() => handleSubmit()}
