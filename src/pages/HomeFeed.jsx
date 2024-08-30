@@ -7,34 +7,42 @@ import {
 import { db } from '../firebase';
 import Post from '../components/Post';
 import { useEffect, useState } from 'react';
+import { toast } from "react-toastify";
 
 export default function HomeFeed() {
 
-  const [data, setData] = useState();
-
-  async function getData() {
-    const q = query(collection(db, 'posts'), orderBy('timestamp', 'desc'));
-    const querySnapshot = await getDocs(q);
-    let temp = [];
-    querySnapshot.forEach((doc) => {
-      temp.push({ id: doc.id, ...doc.data() });
-    });
-    setData(temp)
-  }
+  const [posts, setPosts] = useState(null);
   
   useEffect(() => {
-    console.log(data)
-  }, [data])
+    async function getPosts() {
+      try {
+        const q = query(collection(db, 'posts'), orderBy('timestamp', 'desc'));
+        const querySnapshot = await getDocs(q);
+        const posts = [];
+        querySnapshot.forEach((doc) => {
+          posts.push({ id: doc.id, ...doc.data() });
+        });
+        setPosts(posts)
+      } catch (error) {
+        console.log(error);
+        toast.error("Couldn't get posts")
+      }
+    }
+
+    getPosts();
+  }, [])
 
   useEffect(() => {
-    getData();
-  }, [])
+    // posts.map((post) => {console.log(post.id, post)})
+    console.log(posts)
+  }, [posts])
+
 
   return (
     <div>
-      {data.map((post) => (
+      {posts ? posts.map((post) => (
         <Post key={post.id} post={post} />
-      ))}
+      )) : <h3>Loading</h3>}
     </div>
   );
 }
