@@ -1,4 +1,7 @@
 import { HiOutlineDotsVertical } from 'react-icons/hi';
+import ImageSlider from './ImageSlider';
+import PollTemplate from './PollTemplate';
+import DoubleImgTemp from './DoubleImgTemp';
 // import LikeSection from './LikeSection';
 // import CommentSection from './CommentSection';
 
@@ -14,11 +17,8 @@ export default function Post({ post }) {
         <p className='flex-1 font-bold'>{post.username}</p> 
         <HiOutlineDotsVertical className='h-5 cursor-pointer' />
       </div>
-      {/* <img
-        src={post.image}
-        alt={post.caption}
-        className='object-cover w-full'
-      /> */}
+      {post.type == "images" & post.choices.length == 2 ? <DoubleImgTemp images = {post.choices}/> : <ImageSlider images = {post.choices}/>} 
+      {post.type == "worded" ? <PollTemplate poll = {post.choices}/> : null}
       {/* <LikeSection id={post.id} /> */}
       <p className='p-5 truncate'>
         <span className='font-bold mr-2'>{post.decisionTitle}</span>
